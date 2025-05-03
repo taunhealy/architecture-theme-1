@@ -1,0 +1,733 @@
+"use client";
+
+import React, { useEffect, useState, useRef } from "react";
+import HeroBeams from "@/app/components/HeroBeams";
+import Image from "next/image";
+import { urlForImage } from "@/lib/urlForImage";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Button } from "@/app/components/ui/button";
+import TechStack from "@/app/components/TechStack";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/app/components/ui/dialog";
+import { PortableText, PortableTextBlock } from "@portabletext/react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { useGSAP } from "@gsap/react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+interface SectionData {
+  _type: string;
+  _key: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  heroImage?: {
+    _type: string;
+    asset: {
+      _ref: string;
+      _type: string;
+    };
+  };
+  heroLogos?: Array<{
+    _type: string;
+    _key: string;
+    asset: {
+      _ref: string;
+      _type: string;
+    };
+    alt?: string;
+  }>;
+  inDevelopment?: {
+    _type: string;
+    _ref: string;
+    title?: string;
+    mainImage?: {
+      _type: string;
+      asset: {
+        _ref: string;
+        _type: string;
+      };
+    };
+    description?: PortableTextBlock[] | string;
+    workItemId?: string;
+    workType?: {
+      _type: string;
+      _key: string;
+      title: string;
+    };
+    coverImage?: {
+      _type: string;
+      asset: {
+        _ref: string;
+        _type: string;
+      };
+    };
+    core?: {
+      projectDescription?: string;
+    };
+  };
+}
+
+// Make sure to register all plugins
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+
+const SimpleDialogContent = ({
+  children,
+  ...props
+}: { children: React.ReactNode } & DialogPrimitive.DialogContentProps) => {
+  return (
+    <DialogContent
+      className="w-[90vw] max-w-[800px] max-h-[85vh] overflow-y-auto"
+      {...props}
+    >
+      {children}
+    </DialogContent>
+  );
+};
+
+export default function HeroSection({ data }: { data?: SectionData }) {
+  const [sectionData, setSectionData] = useState<SectionData | null>(
+    data || null
+  );
+  const [hasImageError, setHasImageError] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const mazeRef = useRef(null);
+
+  // Add GSAP version check here
+  useEffect(() => {
+    console.log("GSAP version:", gsap.version);
+  }, []);
+
+  // Add pyramid animation
+  useEffect(() => {
+    const pyramidLayers = document.querySelectorAll(".pyramid-path");
+
+    if (pyramidLayers.length) {
+      // Set initial state - all layers invisible
+      gsap.set(pyramidLayers, { opacity: 0, visibility: "hidden" });
+
+      // Create staggered animation
+      gsap
+        .timeline()
+        .to(".pyramid-layer-1", {
+          opacity: 0.8,
+          visibility: "visible",
+          duration: 0.8,
+          ease: "power2.out",
+          delay: 0.5,
+        })
+        .to(
+          ".pyramid-layer-2",
+          {
+            opacity: 0.7,
+            visibility: "visible",
+            duration: 0.8,
+            ease: "power2.out",
+          },
+          "-=0.4"
+        )
+        .to(
+          ".pyramid-layer-3",
+          {
+            opacity: 0.6,
+            visibility: "visible",
+            duration: 0.8,
+            ease: "power2.out",
+          },
+          "-=0.4"
+        )
+        .to(
+          ".pyramid-layer-4",
+          {
+            opacity: 0.4,
+            visibility: "visible",
+            duration: 0.8,
+            ease: "power2.out",
+            onComplete: () => {
+              // Add the breathing animation class after fade-in
+              document
+                .querySelector(".pyramid-layer-4")
+                ?.classList.add("animate-breathing");
+            },
+          },
+          "-=0.4"
+        );
+    }
+  }, []);
+
+  // Character limit for project description
+  const CHAR_LIMIT = 100;
+
+  // Get the project description with proper fallbacks
+  const getProjectDescription = () => {
+    const description =
+      data?.inDevelopment?.description ||
+      data?.inDevelopment?.core?.projectDescription ||
+      "Custom e-commerce platform with integrated analytics dashboard";
+
+    return typeof description === "string"
+      ? description
+      : "Custom e-commerce platform with integrated analytics dashboard";
+  };
+
+  // Truncate description if needed
+  const truncateDescription = (text: string) => {
+    if (text.length <= CHAR_LIMIT || isDescriptionExpanded) return text;
+    return text.substring(0, CHAR_LIMIT) + "...";
+  };
+
+  // Project description to display
+  const projectDescription = getProjectDescription();
+  const displayDescription = truncateDescription(projectDescription);
+
+  // Enhanced debugging
+  useEffect(() => {
+    console.groupCollapsed("[HeroSection] Data Debug");
+    if (data) {
+      console.log(
+        "%c✅ Received content data",
+        "color: #4CAF50; font-weight: bold"
+      );
+      console.table({
+        "Has Title": !!data.heroTitle,
+        "Has Subtitle": !!data.heroSubtitle,
+        "Image Present": !!data.heroImage,
+        "Logos Count": data.heroLogos?.length || 0,
+      });
+      console.log("%cImage Metadata:", "color: #2196F3", data.heroImage);
+      console.log("%cLogos Metadata:", "color: #2196F3", data.heroLogos);
+    } else {
+      console.warn(
+        "%c⚠️ No content data provided",
+        "color: #FF9800; font-weight: bold"
+      );
+    }
+    console.groupEnd();
+  }, [data]);
+
+  console.log("HeroSection received data:", data);
+
+  useEffect(() => {
+    // GSAP animation for beams container
+    const beamsTimeline = gsap.timeline({
+      repeat: -1,
+      defaults: { duration: 3, ease: "power3.inOut" },
+    });
+
+    // Wait for DOM to be fully loaded
+    const animateBeams = () => {
+      const beamsContainer = document.querySelector(".beams-container");
+
+      if (beamsContainer) {
+        console.log("Found beams container, applying animation");
+        beamsTimeline
+          .to(beamsContainer, {
+            rotate: 15,
+            scale: 1.8,
+          })
+          .to(beamsContainer, {
+            rotate: -5,
+            scale: 0.7,
+          })
+          .to(beamsContainer, {
+            rotate: 0,
+            scale: 1,
+          }); // Return to initial state
+      } else {
+        console.warn("Beams container element not found for GSAP animation");
+      }
+    };
+
+    // Use a small timeout to ensure DOM is ready
+    const timer = setTimeout(() => {
+      animateBeams();
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+      beamsTimeline.kill(); // Cleanup animation on unmount
+    };
+  }, []);
+
+  return (
+    <div className="overflow-hidden">
+      <section className="beams-text-section flex flex-col h-[100vh] relative z-0 bg-black">
+        {/* Enhanced gradient background effect - lowest z-index */}
+        <div className="absolute inset-0 -z-30 overflow-hidden">
+          <div className="absolute bottom-0 left-0 w-[50%] h-[50%] bg-gradient-to-tr from-[#22c55e]/20 via-[#22c55e]/5 to-transparent blur-[120px]"></div>
+          <div className="absolute top-20 right-0 w-[50%] h-[50%] bg-gradient-to-bl from-[#f43f5e]/20 via-[#a855f7]/10 to-transparent blur-[120px]"></div>
+        </div>
+
+        {/* HeroBeams positioned slightly lower with medium z-index */}
+        <div className="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none translate-y-[15%]">
+          <div className="beams-container w-full h-full">
+            <HeroBeams />
+          </div>
+        </div>
+
+        {/* Centered Text Logo with beam pass-through effect - alternative */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-20 hidden md:block">
+          {/* Glass effect container */}
+          <div className="relative rounded-xl backdrop-blur-md bg-black/30 border border-white/10 p-8 shadow-lg">
+            <div className="flex flex-col items-center space-y-8">
+              {/* Smaller pyramid */}
+              <div
+                className="relative w-[80px] h-[80px] pyramid-container"
+                ref={mazeRef}
+              >
+                <svg
+                  width="80"
+                  height="80"
+                  viewBox="0 0 140 140"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  id="pyramid-svg"
+                >
+                  {/* Outer square - using major third ratio for spacing */}
+                  <rect
+                    x="5"
+                    y="5"
+                    width="130"
+                    height="130"
+                    stroke="var(--color-primary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.8"
+                    className="pyramid-path pyramid-layer-1"
+                  />
+
+                  {/* Inner pyramid elements - each using major third ratio (5:4) for spacing */}
+                  <rect
+                    x="31"
+                    y="31"
+                    width="78"
+                    height="78"
+                    stroke="var(--color-secondary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.7"
+                    className="pyramid-path pyramid-layer-2"
+                  />
+                  <rect
+                    x="50"
+                    y="50"
+                    width="40"
+                    height="40"
+                    stroke="var(--color-tertiary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.6"
+                    className="pyramid-path pyramid-layer-3"
+                  />
+
+                  {/* Innermost square (quaternary/pink) - interactive with hover effect */}
+                  <Link href="/about" passHref>
+                    <rect
+                      x="62"
+                      y="62"
+                      width="16"
+                      height="16"
+                      stroke="var(--color-quaternary)"
+                      strokeWidth="2.5"
+                      strokeOpacity="1"
+                      fill="var(--color-quaternary)"
+                      fillOpacity="0.7"
+                      className="pyramid-path pyramid-layer-4 cursor-pointer animate-breathing"
+                    />
+                  </Link>
+
+                  {/* Connecting lines - adjusted for major third ratio */}
+                  <line
+                    x1="70"
+                    y1="5"
+                    x2="70"
+                    y2="31"
+                    stroke="var(--color-primary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.8"
+                    className="pyramid-path pyramid-layer-1"
+                  />
+                  <line
+                    x1="70"
+                    y1="109"
+                    x2="70"
+                    y2="135"
+                    stroke="var(--color-primary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.8"
+                    className="pyramid-path pyramid-layer-1"
+                  />
+                  <line
+                    x1="5"
+                    y1="70"
+                    x2="31"
+                    y2="70"
+                    stroke="var(--color-primary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.8"
+                    className="pyramid-path pyramid-layer-1"
+                  />
+                  <line
+                    x1="109"
+                    y1="70"
+                    x2="135"
+                    y2="70"
+                    stroke="var(--color-primary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.8"
+                    className="pyramid-path pyramid-layer-1"
+                  />
+
+                  {/* Diagonal connectors - adjusted for major third ratio */}
+                  <line
+                    x1="50"
+                    y1="50"
+                    x2="31"
+                    y2="31"
+                    stroke="var(--color-secondary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.7"
+                    className="pyramid-path pyramid-layer-2"
+                  />
+                  <line
+                    x1="90"
+                    y1="50"
+                    x2="109"
+                    y2="31"
+                    stroke="var(--color-secondary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.7"
+                    className="pyramid-path pyramid-layer-2"
+                  />
+                  <line
+                    x1="50"
+                    y1="90"
+                    x2="31"
+                    y2="109"
+                    stroke="var(--color-secondary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.7"
+                    className="pyramid-path pyramid-layer-2"
+                  />
+                  <line
+                    x1="90"
+                    y1="90"
+                    x2="109"
+                    y2="109"
+                    stroke="var(--color-secondary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.7"
+                    className="pyramid-path pyramid-layer-2"
+                  />
+
+                  {/* Additional pyramid paths - adjusted for major third ratio */}
+                  <path
+                    d="M62 70H50"
+                    stroke="var(--color-tertiary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.6"
+                    className="pyramid-path pyramid-layer-3"
+                  />
+                  <path
+                    d="M90 70H78"
+                    stroke="var(--color-tertiary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.6"
+                    className="pyramid-path pyramid-layer-3"
+                  />
+                  <path
+                    d="M70 62V50"
+                    stroke="var(--color-tertiary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.6"
+                    className="pyramid-path pyramid-layer-3"
+                  />
+                  <path
+                    d="M70 90V78"
+                    stroke="var(--color-tertiary)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.6"
+                    className="pyramid-path pyramid-layer-3"
+                  />
+                </svg>
+              </div>
+
+              {/* Brand title and subtitle */}
+              <div className="flex flex-col items-center space-y-3">
+                <div className="flex flex-col items-center">
+                  <h1 className="text-white font-primary text-2xl sm:text-[16px] font-normal tracking-[-0.02em] leading-tight mb-3">
+                    Kea Logic
+                  </h1>
+                  <div className="w-full border-b border-white/20 mb-3"></div>
+
+                  <div className="flex flex-col items-center space-y-3">
+                    <h2 className="text-white/80 font-primary text-base sm:text-[24px] tracking-[-0.015em] leading-snug">
+                      Web Architecture
+                    </h2>
+                    <div className="w-full border-b border-white/20 mb-3"></div>
+                    <span className="px-2 py-1 text-[12px] bg-black/40 border border-white/20 rounded-md text-white/70">
+                      Design & Development
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col h-full py-8 px-4 sm:px-8 md:px-12 lg:px-20 relative z-20">
+          <div className="flex flex-col h-full md:justify-center justify-start pt-20 md:pt-0 max-w-7xl mx-auto w-full">
+            {/* Top section with title and in-development */}
+            <div className="flex flex-col lg:flex-row justify-between items-center w-full gap-8">
+              {/* Left column with title and Custom Solutions */}
+              <div className="flex flex-col gap-8 max-w-full lg:max-w-[420px]">
+                {/* Custom Solutions section - moved here */}
+                <div className="border border-white/20 rounded-lg p-4 sm:p-6 bg-black/40 backdrop-blur-sm overflow-hidden relative">
+                  <h3 className="text-white font-primary text-xl sm:text-2xl mb-3 sm:mb-5 border-b border-white/20 pb-3">
+                    Custom Solutions
+                  </h3>
+                  <ul className="text-white/80 font-primary space-y-2 sm:space-y-3">
+                    {[
+                      {
+                        text: "Custom Checkout Systems",
+                        color: "var(--color-primary)",
+                      },
+                      {
+                        text: "Booking & Reservation Flows",
+                        color: "var(--color-secondary)",
+                      },
+                      {
+                        text: "E-commerce Solutions",
+                        color: "var(--color-tertiary)",
+                      },
+                      {
+                        text: "Content Management Systems",
+                        color: "var(--color-quaternary)",
+                      },
+                    ].map((solution, index) => (
+                      <li
+                        key={index}
+                        className="flex items-center text-base text-[16px]"
+                      >
+                        <span
+                          className="inline-block w-2 h-2 rounded-full mr-3"
+                          style={{ backgroundColor: solution.color }}
+                        ></span>
+                        {solution.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Center pyramid and titles are already positioned absolutely */}
+
+              {/* Right sidebar */}
+              <div className="w-full lg:w-[350px] flex flex-col gap-6">
+                {/* In Development Section - hidden on mobile */}
+                <div className="hidden md:block in-development-container relative border border-white/20 rounded-lg p-6 bg-black/40 backdrop-blur-sm overflow-hidden">
+                  {/* Animated border glow effect */}
+                  <div className="absolute inset-0 -z-10 animate-pulse">
+                    <div className="absolute inset-0 bg-black blur-sm"></div>
+                  </div>
+
+                  <h3 className="text-white font-primary text-lg mb-5 border-b border-white/20 pb-3">
+                    In Development
+                  </h3>
+
+                  <div className="project-card mb-5">
+                    <h4 className="text-white font-primary text-base mb-5">
+                      {data?.inDevelopment?.title || "Project Horizon"}
+                    </h4>
+
+                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                      <DialogTrigger asChild>
+                        {data?.inDevelopment?.mainImage ||
+                        data?.inDevelopment?.coverImage ? (
+                          <div className="relative h-32 w-full rounded-md overflow-hidden mb-5 cursor-pointer hover:opacity-90 transition-opacity">
+                            <Image
+                              src={urlForImage(
+                                data.inDevelopment.mainImage ||
+                                  data.inDevelopment.coverImage
+                              ).url()}
+                              alt={
+                                data.inDevelopment.title || "Current project"
+                              }
+                              fill
+                              priority
+                              className="object-cover"
+                              onError={() => setHasImageError(true)}
+                            />
+                          </div>
+                        ) : (
+                          data?.heroImage && (
+                            <div className="relative h-32 w-full rounded-md overflow-hidden mb-5 cursor-pointer hover:opacity-90 transition-opacity">
+                              <Image
+                                src={urlForImage(data.heroImage).url()}
+                                alt="Current project"
+                                fill
+                                priority
+                                className="object-cover"
+                                onError={() => setHasImageError(true)}
+                              />
+                            </div>
+                          )
+                        )}
+                      </DialogTrigger>
+
+                      <SimpleDialogContent
+                        className="dialog-content"
+                        title={data?.inDevelopment?.title || "Project Details"}
+                      >
+                        <div className="flex flex-col gap-4">
+                          <div className="relative h-60 w-full rounded-md overflow-hidden mb-4">
+                            <Image
+                              src={urlForImage(
+                                data?.inDevelopment?.mainImage ||
+                                  data?.inDevelopment?.coverImage ||
+                                  data?.heroImage
+                              ).url()}
+                              alt={
+                                data?.inDevelopment?.title || "Current project"
+                              }
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+
+                          <div className="space-y-4">
+                            {typeof data?.inDevelopment?.description ===
+                            "object" ? (
+                              <div className="text-white/80 font-primary">
+                                <PortableText
+                                  value={
+                                    data.inDevelopment
+                                      .description as PortableTextBlock[]
+                                  }
+                                  components={{
+                                    block: {
+                                      normal: ({ children }) => {
+                                        return (
+                                          <p className="mb-4 font-primary">
+                                            {children}
+                                          </p>
+                                        );
+                                      },
+                                      h1: ({ children }) => (
+                                        <h1 className="text-xl font-primary mb-4">
+                                          {children}
+                                        </h1>
+                                      ),
+                                      h2: ({ children }) => (
+                                        <h2 className="text-lg font-primary mb-3">
+                                          {children}
+                                        </h2>
+                                      ),
+                                    },
+                                    list: {
+                                      bullet: ({ children }) => (
+                                        <ul className="list-disc pl-5 mb-4 space-y-2">
+                                          {children}
+                                        </ul>
+                                      ),
+                                      number: ({ children }) => (
+                                        <ol className="list-decimal pl-5 mb-4 space-y-2">
+                                          {children}
+                                        </ol>
+                                      ),
+                                    },
+                                    listItem: {
+                                      bullet: ({ children }) => (
+                                        <li className="mb-2 font-primary">
+                                          {children}
+                                        </li>
+                                      ),
+                                      number: ({ children }) => (
+                                        <li className="mb-2 font-primary">
+                                          {children}
+                                        </li>
+                                      ),
+                                    },
+                                    marks: {
+                                      link: ({ value, children }) => {
+                                        const target = (
+                                          value?.href || ""
+                                        ).startsWith("http")
+                                          ? "_blank"
+                                          : undefined;
+                                        return (
+                                          <a
+                                            href={value?.href}
+                                            target={target}
+                                            rel={
+                                              target === "_blank"
+                                                ? "noopener noreferrer"
+                                                : undefined
+                                            }
+                                            className="text-primary hover:underline"
+                                          >
+                                            {children}
+                                          </a>
+                                        );
+                                      },
+                                      strong: ({ children }) => (
+                                        <strong className="font-semibold">
+                                          {children}
+                                        </strong>
+                                      ),
+                                      em: ({ children }) => (
+                                        <em className="italic">{children}</em>
+                                      ),
+                                    },
+                                  }}
+                                />
+                              </div>
+                            ) : (
+                              <p className="text-white/80 font-primary">
+                                {getProjectDescription()}
+                              </p>
+                            )}
+
+                            <p className="text-white/60 font-primary text-sm">
+                              Category:{" "}
+                              <span className="px-2 py-1 bg-black/40 border border-white/20 rounded-md text-white/70 inline-block mt-1">
+                                {data?.inDevelopment?.workType?.title ||
+                                  "Booking System"}
+                              </span>
+                            </p>
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            className="mt-4 self-end"
+                            onClick={() => setDialogOpen(false)}
+                          >
+                            Close
+                          </Button>
+                        </div>
+                      </SimpleDialogContent>
+                    </Dialog>
+                  </div>
+
+                  <div className="sanity-reference mt-5 pt-3 border-t border-white/20">
+                    <p className="text-white/50 font-primary text-xs flex items-center space-x-3">
+                      <span className="inline-block w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                      <span className="px-3 py-1.5 bg-black/40 border border-white/20 rounded-md text-white/70">
+                        {data?.inDevelopment?.workType?.title ||
+                          "Booking System"}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Tech Stack */}
+                <TechStack />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
