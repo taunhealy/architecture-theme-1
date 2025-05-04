@@ -8,10 +8,10 @@
 
 :root {
   /* Brand Colors */
-  --color-primary: #22c55e; /* Green */
-  --color-secondary: #f97316; /* Orange */
-  --color-tertiary: #FF6A00; /* Orange */
-  --color-quaternary: #FDEFCF; /* Tan */
+  --color-primary: #262626; /* Black */
+  --color-secondary: #f9f9f2; /* Grey */
+  --color-tertiary: #ff6a00; /* Orange */
+  --color-quaternary: #ffeac0; /* Tan */
   /* Base Colors */
   --color-black: #000000;
   --color-white: #ffffff;

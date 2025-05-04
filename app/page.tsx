@@ -3,19 +3,7 @@ import { homePageQuery, debugPageData } from "@/lib/queries";
 import WorkSection from "@/app/sections/WorkSection";
 import HeroSection from "@/app/sections/HeroSection";
 import AboutSection from "@/app/sections/AboutSection";
-
-interface HeroSectionProps {
-  data: {
-    heroWork: {
-      coverImage: any;
-      title: string;
-      categories: Array<{
-        title: string;
-        slug: { current: string };
-      }>;
-    }[];
-  };
-}
+import WorkHeroSection from "./sections/WorkHeroSection";
 
 export default async function Home() {
   const data = await client.fetch(
@@ -30,6 +18,8 @@ export default async function Home() {
   return (
     <>
       <HeroSection data={{ heroWorks: data.heroWorks }} />
+      <AboutSection data={data.about} />
+      <WorkHeroSection data={data.work} />
     </>
   );
 }
