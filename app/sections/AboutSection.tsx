@@ -1,14 +1,17 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { useScrollReveal } from "@/app/hooks/useScrollReveal";
 
 interface AboutSectionProps {
-  data: {
-    heading: string;
-    description: string;
-    images: Array<{ url: string }>;
-    teamHeading: string;
-    teamDescription: string;
-    teamMembers: Array<{
+  data?: {
+    heading?: string;
+    description?: string;
+    images?: Array<{ url: string }>;
+    teamHeading?: string;
+    teamDescription?: string;
+    teamMembers?: Array<{
       name: string;
       role: string;
       image: {
@@ -20,13 +23,31 @@ interface AboutSectionProps {
 }
 
 const AboutSection = ({ data }: AboutSectionProps) => {
+  // Use our scroll reveal hook
+  const { sectionRef } = useScrollReveal({
+    duration: 0.75,
+    stagger: 0.5,
+    start: "top 80%",
+  });
+
+  // Default values if data is null or properties are undefined
+  const heading =
+    data?.heading ??
+    "We specialize in modern, elegant architecture that inspires peace.";
+  const description =
+    data?.description ??
+    "At BaumFormel, we offer comprehensive architectural design services that blend artistic vision with functional practicality.";
+
   return (
-    <section className="relative w-full h-[720px] bg-[var(--color-secondary)]">
-      <div className="flex flex-col py-[76px] px-0 relative  h-[724px] left-0 top-0">
+    <section
+      ref={sectionRef}
+      className="relative w-full h-[720px] bg-[var(--color-secondary)]"
+    >
+      <div className="flex flex-col py-[76px] px-0 relative h-[724px] left-0 top-0">
         {/* Title & Subtitle Container */}
         <div className="flex flex-col items-start mx-auto px-[95px] py-0 gap-[14px] w-[1255px] h-[162px] flex-none order-0 self-stretch flex-grow-0">
           {/* Section Heading */}
-          <div className="flex flex-row justify-start items-center p-[10px]  gap-[10px] w-auto h-[44px] bg-[var(--color-secondary)] flex-none order-0 flex-grow-0">
+          <div className="flex flex-row justify-start items-center p-[10px] gap-[10px] w-auto h-[44px] bg-[var(--color-secondary)] flex-none order-0 flex-grow-0">
             <div className="w-[24px] h-[24px] bg-[var(--color-tertiary)] flex-none order-0 flex-grow-0"></div>
             <span className="w-full h-[14px] font-secondary text-[12px] leading-[14px] tracking-[0.12em] uppercase text-[var(--color-primary)] flex-none order-1 flex-grow-0">
               about us
@@ -36,7 +57,7 @@ const AboutSection = ({ data }: AboutSectionProps) => {
           {/* Section Title */}
           <div className="flex flex-row justify-start items-start px-[20px] py-0 gap-[10px] w-[1065px] h-[104px] flex-none order-1 self-stretch flex-grow-0">
             <h2 className="w-[760px] h-[104px] font-primary text-[49px] leading-[59px] tracking-[-0.05em] text-[var(--color-primary)] flex-none order-0 flex-grow-1">
-              We specialize in modern, elegant architecture that inspires peace.
+              {heading}
             </h2>
           </div>
         </div>
@@ -44,7 +65,7 @@ const AboutSection = ({ data }: AboutSectionProps) => {
         {/* Content Section */}
         <div className="flex flex-row flex-wrap mx-auto items-start content-start p-[49px_95px_32px] gap-[0px_95px] w-[1255px] h-[425px] flex-none order-1 self-stretch flex-grow-0">
           {/* Left Column - Image */}
-          <div className="flex flex-row items-center px-[20px] py-0 w-[271px] h-[344px] flex-none order-0 flex-grow-0">
+          <div className="flex flex-row items-center py-0 w-[271px] h-[344px] flex-none order-0 flex-grow-0">
             <img
               src="/images/image-about.webp"
               alt="About BaumFormel"
@@ -57,10 +78,7 @@ const AboutSection = ({ data }: AboutSectionProps) => {
             {/* Text Box */}
             <div className="flex flex-row items-start p-[21px_32px_21px_32px] gap-[10px] w-[674px] h-[137px] bg-[var(--color-quaternary)] rounded-[8px] flex-none order-0 self-stretch flex-grow-0">
               <p className="w-[300px] h-[95px] font-primary text-[16px] leading-[19px] tracking-[-0.05em] text-[var(--color-primary)] flex-none order-0 flex-grow-1">
-                At BaumFormel, we offer comprehensive architectural design
-                services that blend artistic vision with functional
-                practicality, tailored to serve both residential and commercial
-                properties.
+                {description}
               </p>
               <p className="w-[300px] h-[76px] font-primary text-[16px] leading-[19px] tracking-[-0.05em] text-[var(--color-primary)] flex-none order-1 flex-grow-1">
                 Our Modern chic architectural design is a blend of contemporary

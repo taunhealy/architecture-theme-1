@@ -14,7 +14,8 @@
   --color-quaternary: #ffeac0; /* Tan */
   /* Base Colors */
   --color-black: #000000;
-  --color-white: #ffffff;
+  --color-white: #f9f9f2;
+  --color-gray: #1d1d1d;
 
   /* Text Colors */
   --color-text-primary: var(--color-black);

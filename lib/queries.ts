@@ -379,15 +379,71 @@ export const getRelatedWorksQuery = groq`
   }
 }`;
 
-export const heroWorksQuery = `
-  *[_type == "heroWork" && active == true][0] {
+// For fetching all hero works
+export const HeroWorksQuery = groq`
+  *[_type == "heroWork"] {
     works[]-> {
+      _id,
       title,
-      "slug": slug.current,
-      coverImage,
+      slug {
+        current
+      },
+      coverImage {
+        asset-> {
+          url
+        }
+      },
       categories[]-> {
         title,
-        "slug": slug.current
+        slug {
+          current
+        }
+      },
+      description
+    }
+  }
+`;
+
+export const heroSectionQuery = groq`
+  *[_type == "page" && slug.current == "home"][0].sections[_type == "heroSection"][0]{
+    _type,
+    _key,
+    heroTitle,
+    heroSubtitle,
+    heroImage,
+    heroLogos[] {
+      _type,
+      _key,
+      asset
+    },
+    "featuredWork": *[_type == "work" && featured == true][0]{
+      _id,
+      title,
+      description,
+      coverImage,
+      categories[]->{ 
+        title, 
+        slug { current } 
+      }
+    }
+  }
+`;
+
+export const aboutSectionQuery = groq`
+  *[_type == "page" && slug.current == "about"][0].sections[_type == "aboutSection"][0]{
+    heading,
+    description,
+    images[]{
+      "url": asset->url
+    },
+    teamHeading,
+    teamDescription,
+    teamMembers[]{
+      name,
+      role,
+      image{
+        "url": asset->url,
+        "alt": asset->altText
       }
     }
   }

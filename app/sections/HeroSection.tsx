@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { urlForImage } from "@/lib/urlForImage";
+import { Button } from "@/app/components/ui/button";
+import { useScrollReveal } from "@/app/hooks/useScrollReveal";
 
 interface HeroSectionProps {
   data: {
@@ -22,6 +24,14 @@ export default function HeroSection({ data }: HeroSectionProps) {
   const [currentWorkIndex, setCurrentWorkIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  // Use our scroll reveal hook with default settings
+  // This will automatically target direct children of the section
+  const { sectionRef } = useScrollReveal({
+    duration: 1.5,
+    stagger: 0.25,
+    start: "top 80%",
+  });
+
   // Auto-rotate through works
   useEffect(() => {
     if (heroWorks.length <= 1) return;
@@ -39,7 +49,10 @@ export default function HeroSection({ data }: HeroSectionProps) {
 
   return (
     <div className="overflow-hidden">
-      <section className="hero-section relative h-screen bg-[#F3F4F2]">
+      <section
+        ref={sectionRef}
+        className="hero-section relative h-screen bg-[#F3F4F2]"
+      >
         {/* Background */}
         <div className="absolute inset-0 w-full h-full">
           <img
@@ -55,18 +68,16 @@ export default function HeroSection({ data }: HeroSectionProps) {
           {/* Main content container */}
           <div className="main-container flex flex-col h-full justify-between py-[21px]">
             {/* Title and CTA section */}
-            <div className="flex flex-row items-end gap-[96px]">
+            <div className="flex flex-row items-end gap-[32px]">
               <div className="value-prop-container flex flex-col gap-[32px] h-full pl-[32px] pb-[21px] pt-[21px] items-start max-w-full bg-[var(--color-quaternary)] rounded-md">
                 <div className="value-prop-text-container pr-[40px] pt-[0px] pb-[0px] h-full rounded-md max-w-[720px]">
                   <h1 className="font-primary text-3xl md:text-[49px] leading-tight md:leading-[59px] tracking-[-0.05em] text-black">
                     We create modern, elegant and beautiful places
                   </h1>
                 </div>
-                <button className="w-[130px] h-[32px] border border-black rounded-[70px]">
-                  <span className="font-primary text-sm leading-[17px] text-black">
-                    Learn More
-                  </span>
-                </button>
+                <Button variant="outline" size="default">
+                  Learn More
+                </Button>
               </div>
 
               {/* Category section with slideshow */}

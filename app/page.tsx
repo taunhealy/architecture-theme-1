@@ -1,25 +1,41 @@
 import { client } from "@/lib/sanity";
-import { homePageQuery, debugPageData } from "@/lib/queries";
+import { HeroWorksQuery, aboutSectionQuery } from "@/lib/queries";
 import WorkSection from "@/app/sections/WorkSection";
 import HeroSection from "@/app/sections/HeroSection";
 import AboutSection from "@/app/sections/AboutSection";
-import WorkHeroSection from "./sections/WorkHeroSection";
+import WorkHeroSection from "@/app/sections/WorkHeroSection";
 
 export default async function Home() {
-  const data = await client.fetch(
-    homePageQuery,
-    {},
-    {
-      cache: "no-store",
-      next: { tags: ["all-data"] },
-    }
-  );
+  // Fetch data for each section independently
+  const [heroWorks, about] = await Promise.all([
+    client.fetch(
+      HeroWorksQuery,
+      {},
+      {
+        cache: "no-store",
+        next: { tags: ["hero-works"] },
+      }
+    ),
+    client.fetch(
+      aboutSectionQuery,
+      {},
+      {
+        cache: "no-store",
+        next: { tags: ["about"] },
+      }
+    ),
+  ]);
+
+  // Extract all works from the hero works documents
+  const allWorks = Array.isArray(heroWorks)
+    ? heroWorks.flatMap((heroWork) => heroWork.works || [])
+    : [];
 
   return (
-    <>
-      <HeroSection data={{ heroWorks: data.heroWorks }} />
-      <AboutSection data={data.about} />
-      <WorkHeroSection data={data.work} />
-    </>
+    <main>
+      <HeroSection data={{ heroWorks: allWorks }} />
+      <AboutSection data={about} />
+      <WorkHeroSection data={{ works: allWorks }} />
+    </main>
   );
 }
