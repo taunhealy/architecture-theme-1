@@ -68,7 +68,7 @@ export default function HeroSection({ data }: HeroSectionProps) {
           {/* Main content container */}
           <div className="main-container flex flex-col h-full justify-between py-[21px]">
             {/* Title and CTA section */}
-            <div className="flex flex-row items-end gap-[32px]">
+            <div className="flex flex-row items-end gap-[61px]">
               <div className="value-prop-container flex flex-col gap-[32px] h-full pl-[32px] pb-[21px] pt-[21px] items-start max-w-full bg-[var(--color-quaternary)] rounded-md">
                 <div className="value-prop-text-container pr-[40px] pt-[0px] pb-[0px] h-full rounded-md max-w-[720px]">
                   <h1 className="font-primary text-3xl md:text-[49px] leading-tight md:leading-[59px] tracking-[-0.05em] text-black">
