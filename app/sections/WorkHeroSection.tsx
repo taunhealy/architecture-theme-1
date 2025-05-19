@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { PortableText } from "@portabletext/react";
-import { Button } from "@/app/components/ui/button";
 import { useScrollReveal } from "@/app/hooks/useScrollReveal";
+import { Button } from "@/app/components/ui/button";
 
 interface WorkHeroSectionProps {
   data: {
@@ -59,7 +59,7 @@ const WorkHeroSection = ({ data }: WorkHeroSectionProps) => {
         <div className="flex flex-col items-start mx-auto px-[95px] py-0 gap-[40px] w-[1255px] h-auto flex-none order-0 self-stretch flex-grow-0">
           {/* Section Heading */}
           <div className="animate-item flex flex-row justify-center items-center p-[10px] gap-[10px] w-[122px] h-[44px] bg-[var(--color-white)] flex-none order-0 flex-grow-0">
-            <div className="w-[24px] h-[24px] bg-[#FF6A00] flex-none order-0 flex-grow-0"></div>
+            <div className="w-[24px] h-[24px] bg-[var(--color-tertiary)] flex-none order-0 flex-grow-0"></div>
             <span className="w-[68px] h-[14px] font-secondary text-[12px] leading-[14px] tracking-[0.12em] uppercase text-black flex-none order-1 flex-grow-0">
               projects
             </span>
@@ -125,7 +125,7 @@ const WorkHeroSection = ({ data }: WorkHeroSectionProps) => {
                   </div>
 
                   {/* Paragraph */}
-                  <div className="flex flex-row items-center p-[0px_21px_32px_0px] gap-[95px] w-[360px] h-[108px] rounded-[8px] flex-none order-1 self-stretch flex-grow-0">
+                  <div className="flex flex-row items-center p-[16px_21px_32px_16px] gap-[95px] w-[360px] h-[108px] rounded-[8px] bg-[var(--color-quaternary)] flex-none order-1 self-stretch flex-grow-0">
                     <div className="w-[339px] h-[76px] font-primary text-[16px] leading-[19px] text-[#1E1E1E] flex-none order-0 flex-grow-1 overflow-hidden">
                       {activeWork?.description ? (
                         <PortableText
@@ -155,16 +155,14 @@ const WorkHeroSection = ({ data }: WorkHeroSectionProps) => {
                 </div>
 
                 {/* Button below description */}
-                <Link href={`/work/${activeWork?.slug?.current}`}>
-                  <Button variant="default" size="default">
-                    View Project
-                  </Button>
-                </Link>
+                <Button href={`/work/${activeWork?.slug?.current}`}>
+                  View Project
+                </Button>
               </div>
             </div>
 
             {/* Work Links - Now nested under the content container */}
-            <div className="animate-item flex flex-row items-center py-[12.1783px] pl-[20px] gap-[32px] h-[37.36px] flex-none">
+            <div className="animate-item flex flex-row items-center px-5 py-[12.1783px] pl-[20px] gap-[32px] w-auto h-[37.36px] flex-none bg-[var(--color-secondary)] rounded-md">
               {works.length > 1 ? (
                 works.map((work, index) => (
                   <Link

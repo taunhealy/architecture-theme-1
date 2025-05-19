@@ -24,13 +24,10 @@ export default function Header() {
   // }, []);
 
   return (
-    <header
-      className="fixed w-full z-50 transition-[background-color,color] duration-700"
-      data-theme={theme}
-    >
-      <nav className="container-small">
-        <div className="flex justify-center items-center h-[90px] px-8">
-          <div className="flex items-center space-x-8 bg-white/80 border border-white/20 p-5 px-7 rounded-lg">
+    <header className="absolute top-5 w-full z-50" data-theme={theme}>
+      <nav className="">
+        <div className="flex justify-end items-center h-[41px] px-7 pt-4">
+          <div className="flex items-center space-x-8 bg-[var(--color-secondary)] border border-black/90 p-5 px-7 rounded-lg">
             {pages.map((page) => (
               <Link
                 key={page.slug}

@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { urlForImage } from "@/lib/urlForImage";
-import { Button } from "@/app/components/ui/button";
 import { useScrollReveal } from "@/app/hooks/useScrollReveal";
+import { Button } from "@/app/components/ui/button";
 
 interface HeroSectionProps {
   data: {
@@ -72,12 +73,10 @@ export default function HeroSection({ data }: HeroSectionProps) {
               <div className="value-prop-container flex flex-col gap-[32px] h-full pl-[32px] pb-[21px] pt-[21px] items-start max-w-full bg-[var(--color-quaternary)] rounded-md">
                 <div className="value-prop-text-container pr-[40px] pt-[0px] pb-[0px] h-full rounded-md max-w-[720px]">
                   <h1 className="font-primary text-3xl md:text-[49px] leading-tight md:leading-[59px] tracking-[-0.05em] text-black">
-                    We create modern, elegant and beautiful places
+                    Creating modern, performant web apps.
                   </h1>
                 </div>
-                <Button variant="outline" size="default">
-                  Learn More
-                </Button>
+                <Button href="/about">Learn More</Button>
               </div>
 
               {/* Category section with slideshow */}
@@ -126,13 +125,13 @@ export default function HeroSection({ data }: HeroSectionProps) {
             </div>
 
             {/* Architecture firm info */}
-            <div className="h-full w-full flex items-end justify-end min-h-[190px]">
+            <div className="h-full w-full flex items-end justify-start min-h-[190px]">
               <div className="flex flex-col gap-[10px] max-w-[311px]">
                 <span className="font-secondary text-sm leading-[17px] tracking-[0.12em] uppercase text-white">
-                  Architecture Firm
+                  Fullstack Web Developer
                 </span>
-                <h2 className="font-primary text-2xl md:text-[32px] leading-tight md:leading-[39px] tracking-[-0.05em] text-white">
-                  John Doe Architects
+                <h2 className="font-primary text-[21px] md:text-[32px] leading-tight md:leading-[39px] tracking-[-0.05em] text-white">
+                  Taun Healy
                 </h2>
               </div>
             </div>

@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useScrollReveal } from "@/app/hooks/useScrollReveal";
+import { Button } from "@/app/components/ui/button";
 
 interface AboutSectionProps {
   data?: {
@@ -33,10 +34,7 @@ const AboutSection = ({ data }: AboutSectionProps) => {
   // Default values if data is null or properties are undefined
   const heading =
     data?.heading ??
-    "We specialize in modern, elegant architecture that inspires peace.";
-  const description =
-    data?.description ??
-    "At BaumFormel, we offer comprehensive architectural design services that blend artistic vision with functional practicality.";
+    "Leveraging Next.js, React Native and Node.js for efficiency, sustainability and harmony.";
 
   return (
     <section
@@ -56,7 +54,7 @@ const AboutSection = ({ data }: AboutSectionProps) => {
 
           {/* Section Title */}
           <div className="flex flex-row justify-start items-start px-[20px] py-0 gap-[10px] w-[1065px] h-[104px] flex-none order-1 self-stretch flex-grow-0">
-            <h2 className="w-[760px] h-[104px] font-primary text-[49px] leading-[59px] tracking-[-0.05em] text-[var(--color-primary)] flex-none order-0 flex-grow-1">
+            <h2 className="w-full h-[104px] font-primary text-[49px] leading-[59px] tracking-[-0.05em] text-[var(--color-primary)] flex-none order-0 flex-grow-1">
               {heading}
             </h2>
           </div>
@@ -76,27 +74,26 @@ const AboutSection = ({ data }: AboutSectionProps) => {
           {/* Right Column - Text and Button */}
           <div className="flex flex-col items-end pt-[32px] gap-[32px] w-[674px] h-[245px] flex-none order-1 flex-grow-1">
             {/* Text Box */}
-            <div className="flex flex-row items-start p-[21px_32px_21px_32px] gap-[10px] w-[674px] h-[137px] bg-[var(--color-quaternary)] rounded-[8px] flex-none order-0 self-stretch flex-grow-0">
-              <p className="w-[300px] h-[95px] font-primary text-[16px] leading-[19px] tracking-[-0.05em] text-[var(--color-primary)] flex-none order-0 flex-grow-1">
-                {description}
+            <div className="flex flex-row items-center p-5 gap-[32px] w-full h-full bg-[var(--color-quaternary)] rounded-[8px] flex-none order-0 self-stretch flex-grow-0">
+              <p className="w-[300px] h-auto font-primary text-[16px] leading-[19px] tracking-[-0.05em] text-[var(--color-primary)] flex-none order-0 flex-grow-1">
+                I have chosen Next.js, React Native and Node.js and AWS as my
+                primary tech stack due to it's innovation, simplicity and
+                scalability.
               </p>
-              <p className="w-[300px] h-[76px] font-primary text-[16px] leading-[19px] tracking-[-0.05em] text-[var(--color-primary)] flex-none order-1 flex-grow-1">
-                Our Modern chic architectural design is a blend of contemporary
-                elements and luxurious accents, that create visually stunning
-                and functional spaces.
+              <p className="w-[300px] h-auto font-primary text-[16px] leading-[19px] tracking-[-0.05em] text-[var(--color-primary)] flex-none order-1">
+                I use other tech such as SanityCMS, Python, GraphQL, integrating
+                APIs such as Paypal and whatever tech is required for the
+                project. I'm passionate about design and a bit of music,
+                science, maths and CG procedural asset generation & VFX using
+                SideFx Houdini. VFX coding inspired me to pursue a career in
+                computer science.
               </p>
             </div>
 
             {/* Button */}
-            <Link
-              href="/about"
-              className="flex flex-col justify-center items-center p-0 w-[140px] h-[32px] border border-[var(--color-primary)] rounded-[70px] flex-none order-1 flex-grow-0 relative"
-            >
-              <div className="w-[120px] h-[32px] flex-none order-0 self-stretch flex-grow-1 z-0"></div>
-              <span className="absolute w-full h-[17px] left-[31px] top-[7px] font-primary text-[14px] leading-[17px] flex items-center text-center text-[var(--color-primary)] flex-none order-1 flex-grow-0 z-1">
-                Learn More
-              </span>
-            </Link>
+            <Button href="/about" variant="primary">
+              Learn More
+            </Button>
           </div>
         </div>
       </div>
